@@ -1,0 +1,261 @@
+/* CourseCard.css */
+
+.course-card {
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  background: #ffffff;
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.course-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.course-image-wrapper img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.course-card:hover .course-image-wrapper img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 1.25rem;
+  height: calc(100% - 180px);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  min-height: 2.8rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.text-muted {
+  font-size: 0.85rem;
+}
+
+.text-success {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #28a745 !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Favorite Button Styles */
+.favorite-btn {
+  position: absolute;
+  top: -45px;
+  right: 10px;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #6c757d; /* Gray color for unfavorited */
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+/* Fallback heart symbols if Bootstrap Icons not loaded */
+.favorite-btn::before {
+  content: '♡';
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+.favorite-btn.favorite-active::before {
+  content: '♥';
+  font-weight: bold;
+}
+
+.favorite-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* When favorited - heart turns red, background stays white */
+.favorite-btn.favorite-active {
+  background: rgba(255, 255, 255, 0.9); /* Keep background white */
+  color: #dc3545; /* Red heart */
+}
+
+.favorite-btn.favorite-active:hover {
+  background: rgba(255, 255, 255, 1); /* Keep background white on hover */
+  color: #c82333; /* Darker red heart on hover */
+}
+
+.favorite-btn i {
+  transition: all 0.2s ease;
+}
+
+.favorite-btn:hover i {
+  transform: scale(1.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .course-card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .card-title {
+    font-size: 1rem;
+    min-height: 2.4rem;
+  }
+  
+  .card-text {
+    font-size: 0.85rem;
+  }
+  
+  .btn-primary {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .favorite-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    top: -42px;
+    right: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .course-image-wrapper img {
+    height: 160px;
+  }
+  
+  .card-body {
+    height: calc(100% - 160px);
+  }
+}
+
+/* Loading state for images */
+.course-image-wrapper img {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.course-image-wrapper img[src] {
+  animation: none;
+  background: none;
+}
+
+/* Card grid improvements */
+.course-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+/* Ensure equal height cards in grid */
+@supports (display: grid) {
+  .course-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Accessibility improvements */
+.favorite-btn:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* Print styles */
+@media print {
+  .course-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #ddd;
+  }
+  
+  .favorite-btn {
+    display: none;
+  }
+  
+  .btn-primary {
+    background: #6c757d !important;
+    color: white !important;
+  }
+}
