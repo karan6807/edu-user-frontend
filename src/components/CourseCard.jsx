@@ -104,7 +104,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
         message = 'Removed from favorites';
       } else {
         // Add to favorites
-        response = await fetch('${API_URL}/api/favorites', {
+        response = await fetch(`${API_URL}/api/favorites`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
