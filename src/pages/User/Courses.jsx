@@ -172,12 +172,14 @@ function Courses() {
         setIsLoading(true);
         setError(null);
 
-        // Fetch courses
-       const coursesResponse = await axios.get("http://localhost:5000/api/courses");
+        // Use environment variable instead of hardcoded localhost
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+        // Fetch courses
+        const coursesResponse = await axios.get(`${API_URL}/api/courses`);
 
         // Fetch categories
-        const categoriesResponse = await axios.get("http://localhost:5000/api/categories");
+        const categoriesResponse = await axios.get(`${API_URL}/api/categories`);
 
         console.log("Fetched courses:", coursesResponse.data);
         console.log("Fetched categories:", categoriesResponse.data);
@@ -508,8 +510,8 @@ function Courses() {
             <div
               id="courses-sidebar"
               className={`bg-white shadow rounded ${isMobile
-                  ? `sidebar-mobile ${sidebarOpen ? "show" : ""}`
-                  : `sidebar-desktop ${sidebarOpen ? "" : "d-none"}`
+                ? `sidebar-mobile ${sidebarOpen ? "show" : ""}`
+                : `sidebar-desktop ${sidebarOpen ? "" : "d-none"}`
                 }`}
               style={{
                 minHeight: isMobile ? "100vh" : "80vh",
@@ -539,8 +541,8 @@ function Courses() {
                   {/* "All" Category */}
                   <div
                     className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 border-0 rounded ${selectedCategory === "All"
-                        ? "active text-white"
-                        : "text-dark"
+                      ? "active text-white"
+                      : "text-dark"
                       }`}
                     style={{ cursor: "pointer", fontSize: "0.9rem" }}
                     onClick={() => handleCategorySelect("All")}
@@ -560,9 +562,9 @@ function Courses() {
                         {/* Main Category */}
                         <div
                           className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center p-3 border-0 rounded ${selectedCategory === (category._id || category.id) &&
-                              selectedSubcategory === "All"
-                              ? "active text-white"
-                              : "text-dark"
+                            selectedSubcategory === "All"
+                            ? "active text-white"
+                            : "text-dark"
                             }`}
                           style={{ cursor: "pointer", fontSize: "0.9rem" }}
                           onClick={() => {
@@ -581,15 +583,15 @@ function Courses() {
                           {subcategories.length > 0 && (
                             <span
                               className={`badge ${selectedCategory === (category._id || category.id) &&
-                                  selectedSubcategory === "All"
-                                  ? "bg-light text-dark"
-                                  : "bg-secondary"
+                                selectedSubcategory === "All"
+                                ? "bg-light text-dark"
+                                : "bg-secondary"
                                 }`}
                             >
                               <i
                                 className={`fas ${expandedCategories[category._id || category.id]
-                                    ? "fa-minus"
-                                    : "fa-plus"
+                                  ? "fa-minus"
+                                  : "fa-plus"
                                   }`}
                               ></i>
                             </span>
@@ -609,9 +611,9 @@ function Courses() {
                                     {/* Subcategory Header */}
                                     <div
                                       className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center p-2 border-0 rounded ${selectedCategory === (category._id || category.id) &&
-                                          selectedSubcategory === (subcategory._id || subcategory.id)
-                                          ? "active text-white"
-                                          : "bg-light text-dark"
+                                        selectedSubcategory === (subcategory._id || subcategory.id)
+                                        ? "active text-white"
+                                        : "bg-light text-dark"
                                         }`}
                                       style={{
                                         cursor: "pointer",
@@ -639,15 +641,15 @@ function Courses() {
                                       {subSubcategories.length > 0 && (
                                         <span
                                           className={`badge ${selectedCategory === (category._id || category.id) &&
-                                              selectedSubcategory === (subcategory._id || subcategory.id)
-                                              ? "bg-light text-dark"
-                                              : "bg-secondary"
+                                            selectedSubcategory === (subcategory._id || subcategory.id)
+                                            ? "bg-light text-dark"
+                                            : "bg-secondary"
                                             }`}
                                         >
                                           <i
                                             className={`fas ${expandedSubcategories[subcategoryKey]
-                                                ? "fa-minus"
-                                                : "fa-plus"
+                                              ? "fa-minus"
+                                              : "fa-plus"
                                               }`}
                                           ></i>
                                         </span>
@@ -662,10 +664,10 @@ function Courses() {
                                             <div
                                               key={subSubcategory._id || subSubcategory.id}
                                               className={`list-group-item list-group-item-action p-2 border-0 rounded mb-1 ${selectedCategory === (category._id || category.id) &&
-                                                  selectedSubcategory === (subcategory._id || subcategory.id) &&
-                                                  selectedSubSubcategory === (subSubcategory._id || subSubcategory.id)
-                                                  ? "active text-white"
-                                                  : "text-dark"
+                                                selectedSubcategory === (subcategory._id || subcategory.id) &&
+                                                selectedSubSubcategory === (subSubcategory._id || subSubcategory.id)
+                                                ? "active text-white"
+                                                : "text-dark"
                                                 }`}
                                               style={{
                                                 cursor: "pointer",
