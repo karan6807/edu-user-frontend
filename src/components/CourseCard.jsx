@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./CourseCard.css";
 
 function CourseCard({ course, onFavouriteToggle, showToast }) {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
       if (!courseId) return;
 
       const token = getAuthToken();
-      const response = await fetch(`http://localhost:5000/api/favorites/check/${courseId}`, {
+      const response = await fetch(`${API_URL}/api/favorites/check/${courseId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -93,7 +94,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
 
       if (isFavorite) {
         // Remove from favorites
-        response = await fetch(`http://localhost:5000/api/favorites/${courseId}`, {
+        response = await fetch(`${API_URL}/api/favorites/${courseId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -103,7 +104,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
         message = 'Removed from favorites';
       } else {
         // Add to favorites
-        response = await fetch('http://localhost:5000/api/favorites', {
+        response = await fetch('${API_URL}/api/favorites', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -152,7 +153,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
   // Handle image URL - use thumbnailUrl from backend if available, otherwise fallback to image
   const getImageUrl = () => {
     if (course.thumbnailUrl) {
-      return `http://localhost:5000${course.thumbnailUrl}`;
+      return `${API_URL}${course.thumbnailUrl}`;
     }
     return course.image || '/default-course-image.jpg';
   };
@@ -177,7 +178,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
       console.log('🔍 Searching for instructor:', course.instructor);
 
       // First, try to find the instructor by name
-      const response = await fetch(`http://localhost:5000/api/instructor-profile/search?name=${encodeURIComponent(course.instructor)}`);
+      const response = await fetch(`${API_URL}/api/instructor-profile/search?name=${encodeURIComponent(course.instructor)}`);
 
       console.log('📡 API Response status:', response.status);
 

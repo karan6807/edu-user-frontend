@@ -5,6 +5,7 @@ import axios from 'axios';
 import CourseCard from '../../components/CourseCard';
 
 const Favorite = () => {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const [favoriteCourses, setFavoriteCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,7 +34,7 @@ const Favorite = () => {
 
   // Axios instance with authentication
   const authenticatedAxios = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: `${API_URL}/api`,
     headers: {
       'Content-Type': 'application/json',
     },

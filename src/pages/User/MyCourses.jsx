@@ -3,15 +3,16 @@ import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 function MyCourses() {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const [purchasedCourses, setPurchasedCourses] = useState([]);
   const [freeCourses, setFreeCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentMessage, setPaymentMessage] = useState(null);
-  
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  
+
   // Check if user came from payment success
   const paymentSuccess = searchParams.get('payment_success');
   const orderId = searchParams.get('order_id');
@@ -27,7 +28,7 @@ function MyCourses() {
       try {
         // Get the token for authorization
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
           setPaymentMessage({
             type: 'error',
@@ -38,24 +39,24 @@ function MyCourses() {
 
         // Handle checkout success from Stripe - NOW WITH AUTHORIZATION HEADER
         const response = await axios.get(
-          `http://localhost:5000/api/orders/checkout-success?session_id=${sessionId}&order_id=${orderId}&payment_success=true`,
+          `${API_URL}/api/orders/checkout-success?session_id=${sessionId}&order_id=${orderId}&payment_success=true`,
           {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           }
         );
-        
+
         if (response.data.success) {
           setPaymentMessage({
             type: 'success',
             message: 'Payment successful! Your courses are now available.'
           });
-          
+
           // Remove payment params from URL
           const newUrl = window.location.pathname;
           window.history.replaceState({}, '', newUrl);
-          
+
           // Refresh courses after successful payment
           setTimeout(() => {
             fetchUserCourses();
@@ -63,7 +64,7 @@ function MyCourses() {
         }
       } catch (error) {
         console.error('Error handling payment success:', error);
-        
+
         if (error.response?.status === 401) {
           setPaymentMessage({
             type: 'error',
@@ -83,7 +84,7 @@ function MyCourses() {
         type: 'warning',
         message: 'Payment was canceled. Your courses are still in your cart.'
       });
-      
+
       // Remove cancel params from URL
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
@@ -95,23 +96,23 @@ function MyCourses() {
     if (course.thumbnailUrl) {
       // Clean up the URL - remove extra spaces and validate
       const cleanUrl = course.thumbnailUrl.trim();
-      
+
       // Check if it's a valid HTTP/HTTPS URL
       if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
         return cleanUrl;
       }
-      
+
       // If it's a relative path, make it absolute (adjust the base URL as needed)
       if (cleanUrl.startsWith('/')) {
-        return `http://localhost:5000${cleanUrl}`;
+        return `${API_URL}${cleanUrl}`;
       }
-      
+
       // If it's just a filename, assume it's in uploads folder
       if (!cleanUrl.includes('/')) {
-        return `http://localhost:5000/uploads/courses/${cleanUrl}`;
+        return `${API_URL}/uploads/courses/${cleanUrl}`;
       }
     }
-    
+
     // Default fallback - you can replace this with a course-related placeholder
     return '/images/default-course-thumbnail.jpg';
   };
@@ -120,16 +121,16 @@ function MyCourses() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const token = localStorage.getItem('token');
       if (!token) {
         setError('Please log in to view your courses.');
         setLoading(false);
         return;
       }
-      
+
       // Get user's completed orders (purchased courses)
-      const ordersResponse = await axios.get('http://localhost:5000/api/orders/user-orders', {
+      const ordersResponse = await axios.get(`${API_URL}/api/orders/user-orders`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -175,7 +176,7 @@ function MyCourses() {
         const uniquePurchased = purchased.filter((course, index, self) =>
           index === self.findIndex(c => c.id === course.id)
         );
-        
+
         const uniqueFree = free.filter((course, index, self) =>
           index === self.findIndex(c => c.id === course.id)
         );
@@ -187,7 +188,7 @@ function MyCourses() {
     } catch (error) {
       console.error('Error fetching user courses:', error);
       setError('Failed to load your courses. Please try again.');
-      
+
       // If token is invalid, might need to redirect to login
       if (error.response?.status === 401) {
         setError('Session expired. Please log in again.');
@@ -235,26 +236,26 @@ function MyCourses() {
             </div>
           )}
         </div>
-        
+
         <div className="card-body d-flex flex-column">
           <h5 className="card-title text-truncate" title={course.title}>
             {course.title}
           </h5>
-          
+
           <div className="mb-2">
             <small className="text-muted">
               <i className="bi bi-person-fill me-1"></i>
               {course.instructor}
             </small>
           </div>
-          
+
           <div className="mb-2">
             <small className="text-muted">
               <i className="bi bi-clock-fill me-1"></i>
               {course.duration}
             </small>
           </div>
-          
+
           {/* Progress Bar */}
           <div className="mb-3">
             <div className="d-flex justify-content-between align-items-center mb-1">
@@ -272,7 +273,7 @@ function MyCourses() {
               ></div>
             </div>
           </div>
-          
+
           <div className="mt-auto">
             <Link
               to={`/course/${course.id}/learning`}
@@ -311,8 +312,8 @@ function MyCourses() {
               <i className="bi bi-exclamation-triangle-fill me-2"></i>
               {error}
             </div>
-            <button 
-              className="btn btn-primary" 
+            <button
+              className="btn btn-primary"
               onClick={() => window.location.reload()}
             >
               Retry
@@ -330,12 +331,12 @@ function MyCourses() {
         <div className="row mb-4">
           <div className="col-12">
             <div className={`alert alert-${paymentMessage.type} alert-dismissible fade show`} role="alert">
-              <i className={`bi ${paymentMessage.type === 'success' ? 'bi-check-circle-fill' : 
+              <i className={`bi ${paymentMessage.type === 'success' ? 'bi-check-circle-fill' :
                 paymentMessage.type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'} me-2`}></i>
               {paymentMessage.message}
-              <button 
-                type="button" 
-                className="btn-close" 
+              <button
+                type="button"
+                className="btn-close"
                 onClick={() => setPaymentMessage(null)}
               ></button>
             </div>
@@ -360,7 +361,7 @@ function MyCourses() {
               </Link>
             </div>
           </div>
-          
+
           {/* Stats Cards */}
           <div className="row my-5 justify-content-around">
             <div className="col-4 col-md-3">

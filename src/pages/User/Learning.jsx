@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 const Learning = () => {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const { id } = useParams(); // Get course ID from URL
   const navigate = useNavigate();
   const [activeLesson, setActiveLesson] = useState(0);
@@ -47,7 +48,7 @@ const Learning = () => {
       }
 
       // Fetch course data from your API
-      const courseResponse = await axios.get(`http://localhost:5000/api/courses/${id}`, {
+      const courseResponse = await axios.get(`${API_URL}/api/courses/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -56,7 +57,7 @@ const Learning = () => {
       setCourseData(courseResponse.data);
 
       // Fetch categories for category name display
-      const categoriesResponse = await axios.get("http://localhost:5000/api/categories");
+      const categoriesResponse = await axios.get(`${API_URL}/api/categories`);
       setCategories(categoriesResponse.data || []);
 
     } catch (error) {
@@ -107,7 +108,7 @@ const Learning = () => {
   const getImageUrl = () => {
     if (!courseData) return '/default-course-image.jpg';
     if (courseData.thumbnailUrl) {
-      return `http://localhost:5000${courseData.thumbnailUrl}`;
+      return `${API_URL}${courseData.thumbnailUrl}`;
     }
     return courseData.image || '/default-course-image.jpg';
   };

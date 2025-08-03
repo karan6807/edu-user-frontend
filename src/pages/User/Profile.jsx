@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 export default function Profile() {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,7 +53,7 @@ export default function Profile() {
       }
 
       // ✅ UPDATED: Changed API endpoint to use user-profile routes
-      const response = await axios.get('http://localhost:5000/api/user-profile/profile', {
+      const response = await axios.get(`${API_URL}/api/user-profile/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -145,7 +146,7 @@ export default function Profile() {
       };
 
       // ✅ UPDATED: Changed API endpoint to use user-profile routes
-      const response = await axios.put('http://localhost:5000/api/user-profile/profile', updateData, {
+      const response = await axios.put(`${API_URL}/api/user-profile/profile`, updateData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

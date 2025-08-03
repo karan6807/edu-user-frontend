@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Navbar() {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
     const [searchQuery, setSearchQuery] = useState("");
     const [cartCount, setCartCount] = useState(0);
     const [userInfo, setUserInfo] = useState({ name: "", email: "", profileImage: null });
@@ -24,7 +25,7 @@ function Navbar() {
     // Function to fetch user info from backend
     const fetchUserInfo = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/user-profile/profile', {
+            const response = await axios.get('${API_URL}/api/user-profile/profile', {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -46,7 +47,7 @@ function Navbar() {
     // Function to fetch cart count from backend
     const fetchCartCount = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/cart", {
+            const response = await axios.get("${API_URL}/api/cart", {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

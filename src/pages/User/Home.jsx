@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 function Home() {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
     const [courses, setCourses] = useState([]);
 
     const faqData = [
@@ -37,7 +38,7 @@ function Home() {
     useEffect(() => {
         const fetchFeaturedCourses = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/admin/courses");
+                const res = await axios.get(`${API_URL}/api/admin/courses`);
                 setCourses(res.data.slice(0, 3)); // Get only 3 courses
             } catch (err) {
                 console.error("Error fetching courses:", err);
@@ -111,7 +112,7 @@ function Home() {
                             <div key={course._id} className="col-md-4 mb-4">
                                 <div className="card h-100 shadow-sm">
                                     <img
-                                        src={`http://localhost:5000${course.thumbnailUrl}`}
+                                        src={`${API_URL}${course.thumbnailUrl}`}
                                         className="card-img-top"
                                         alt={course.title}
                                         style={{

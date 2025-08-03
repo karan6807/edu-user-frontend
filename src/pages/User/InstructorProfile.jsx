@@ -5,6 +5,7 @@ import axios from 'axios';
 import CourseCard from '../../components/CourseCard';
 
 function InstructorProfile() {
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   // Fix: Change from instructorId to id to match the route parameter
   const { id } = useParams();
   const navigate = useNavigate();
@@ -25,11 +26,11 @@ function InstructorProfile() {
 
       // Fix: Use the correct API endpoints
       // Fetch instructor details
-      const instructorResponse = await axios.get(`http://localhost:5000/api/instructor-profile/${id}`);
+      const instructorResponse = await axios.get(`${API_URL}/api/instructor-profile/${id}`);
       setInstructor(instructorResponse.data);
 
       // Fetch instructor's courses
-      const coursesResponse = await axios.get(`http://localhost:5000/api/instructor-profile/${id}/courses`);
+      const coursesResponse = await axios.get(`${API_URL}/api/instructor-profile/${id}/courses`);
       setInstructorCourses(coursesResponse.data);
 
     } catch (err) {
@@ -44,7 +45,7 @@ function InstructorProfile() {
     if (instructor?.profileImage) {
       // If it's a relative path, prepend the base URL
       if (instructor.profileImage.startsWith('/')) {
-        return `http://localhost:5000${instructor.profileImage}`;
+        return `${API_URL}${instructor.profileImage}`;
       }
       return instructor.profileImage;
     }

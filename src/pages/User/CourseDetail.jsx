@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 function CourseDetail() {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -22,11 +23,11 @@ function CourseDetail() {
                 setError(null);
 
                 // Fetch course details
-                const courseResponse = await axios.get(`http://localhost:5000/api/courses/${id}`);
+                const courseResponse = await axios.get(`${API_URL}/api/courses/${id}`);
                 setCourse(courseResponse.data);
 
                 // Fetch categories for category name display
-                const categoriesResponse = await axios.get("http://localhost:5000/api/categories");
+                const categoriesResponse = await axios.get(`${API_URL}/api/categories`);
                 setCategories(categoriesResponse.data || []);
 
             } catch (err) {
@@ -68,7 +69,7 @@ function CourseDetail() {
             instructor: course.instructor || "N/A",
             price: course.price || 0,
             image: course.thumbnailUrl ?
-                `http://localhost:5000${course.thumbnailUrl}` :
+                `${API_URL}${course.thumbnailUrl}` :
                 course.image || '/default-course-image.jpg',
             duration: course.duration || "N/A",
         };
@@ -102,7 +103,7 @@ function CourseDetail() {
                 return;
             }
 
-            const response = await axios.post("http://localhost:5000/api/cart", {
+            const response = await axios.post(`${API_URL}/api/cart`, {
                 courseId: course._id
             }, {
                 headers: {
@@ -159,7 +160,7 @@ function CourseDetail() {
 
     const getImageUrl = () => {
         if (course.thumbnailUrl) {
-            return `http://localhost:5000${course.thumbnailUrl}`;
+            return `${API_URL}${course.thumbnailUrl}`;
         }
         return course.image || '/default-course-image.jpg';
     };
