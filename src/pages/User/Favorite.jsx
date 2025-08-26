@@ -87,11 +87,17 @@ const Favorite = () => {
       const response = await authenticatedAxios.get('/favorites');
       const favoriteData = response.data.items || [];
       
-      // Extract courses from the response
-      const courses = favoriteData.map(item => ({
-        ...item.course,
-        addedAt: item.addedAt
-      }));
+      // Extract courses from the response and fix image URLs
+      const courses = favoriteData.map(item => {
+        const course = { ...item.course, addedAt: item.addedAt };
+        
+        // Fix thumbnail URL for Cloudinary
+        if (course.thumbnailUrl && !course.thumbnailUrl.startsWith('http')) {
+          course.thumbnailUrl = `${API_URL}${course.thumbnailUrl}`;
+        }
+        
+        return course;
+      });
       
       setFavoriteCourses(courses);
     } catch (err) {

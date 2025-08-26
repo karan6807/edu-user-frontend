@@ -69,7 +69,7 @@ function CourseDetail() {
             instructor: course.instructor || "N/A",
             price: course.price || 0,
             image: course.thumbnailUrl ?
-                `${API_URL}${course.thumbnailUrl}` :
+                (course.thumbnailUrl.startsWith('http') ? course.thumbnailUrl : `${API_URL}${course.thumbnailUrl}`) :
                 course.image || '/default-course-image.jpg',
             duration: course.duration || "N/A",
         };
@@ -160,6 +160,11 @@ function CourseDetail() {
 
     const getImageUrl = () => {
         if (course.thumbnailUrl) {
+            // If it's already a full URL (Cloudinary), use it directly
+            if (course.thumbnailUrl.startsWith('http')) {
+                return course.thumbnailUrl;
+            }
+            // If it's a relative path (old local uploads), add API_URL
             return `${API_URL}${course.thumbnailUrl}`;
         }
         return course.image || '/default-course-image.jpg';
@@ -372,7 +377,7 @@ function CourseDetail() {
                             // Free Course - Start Learning Button
                             <button
                                 className="btn btn-success w-100 py-3"
-                                onClick={() => navigate(`/learning/${course._id}`)}
+                                onClick={() => navigate(`/course/${course._id}/learning`)}
                                 disabled={!course.isPublished}
                             >
                                 <i className="fas fa-play me-2"></i>

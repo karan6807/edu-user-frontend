@@ -9,6 +9,7 @@ function MyCourses() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentMessage, setPaymentMessage] = useState(null);
+  const [progressData, setProgressData] = useState({});
 
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -22,6 +23,13 @@ function MyCourses() {
     fetchUserCourses();
     handlePaymentRedirect();
   }, []);
+
+  // Update courses with progress data when progress is loaded
+  useEffect(() => {
+    if (Object.keys(progressData).length > 0) {
+      updateCoursesWithProgress();
+    }
+  }, [progressData]);
 
   const handlePaymentRedirect = async () => {
     if (paymentSuccess === 'true' && (orderId || sessionId)) {
@@ -57,9 +65,10 @@ function MyCourses() {
           const newUrl = window.location.pathname;
           window.history.replaceState({}, '', newUrl);
 
-          // Refresh courses after successful payment
+          // Refresh courses and progress after successful payment
           setTimeout(() => {
             fetchUserCourses();
+            fetchAllProgress();
           }, 1000);
         }
       } catch (error) {
@@ -97,12 +106,12 @@ function MyCourses() {
       // Clean up the URL - remove extra spaces and validate
       const cleanUrl = course.thumbnailUrl.trim();
 
-      // Check if it's a valid HTTP/HTTPS URL
+      // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
       if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
         return cleanUrl;
       }
 
-      // If it's a relative path, make it absolute (adjust the base URL as needed)
+      // If it's a relative path, make it absolute
       if (cleanUrl.startsWith('/')) {
         return `${API_URL}${cleanUrl}`;
       }
@@ -113,8 +122,57 @@ function MyCourses() {
       }
     }
 
-    // Default fallback - you can replace this with a course-related placeholder
+    // Default fallback
     return '/images/default-course-thumbnail.jpg';
+  };
+
+  // Fetch all user progress data
+  const fetchAllProgress = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await axios.get(`${API_URL}/api/progress/user/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        // Create a map of courseId -> progress
+        const progressMap = {};
+        response.data.progress.forEach(prog => {
+          progressMap[prog.course._id || prog.course] = {
+            percentage: prog.percentage,
+            isCompleted: prog.isCompleted,
+            currentTime: prog.currentTime,
+            duration: prog.duration,
+            lastWatched: prog.lastWatched
+          };
+        });
+        setProgressData(progressMap);
+      }
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+    }
+  };
+
+  // Update courses with progress data
+  const updateCoursesWithProgress = () => {
+    const updateCourseProgress = (courses) => {
+      return courses.map(course => {
+        const courseProgress = progressData[course.id] || { percentage: 0, isCompleted: false };
+        return {
+          ...course,
+          progress: courseProgress.percentage || 0,
+          isCompleted: courseProgress.isCompleted || false,
+          lastWatched: courseProgress.lastWatched || null
+        };
+      });
+    };
+
+    setPurchasedCourses(prev => updateCourseProgress(prev));
+    setFreeCourses(prev => updateCourseProgress(prev));
   };
 
   const fetchUserCourses = async () => {
@@ -131,6 +189,13 @@ function MyCourses() {
 
       // Get user's completed orders (purchased courses)
       const ordersResponse = await axios.get(`${API_URL}/api/orders/user-orders`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Get user's free course enrollments
+      const enrollmentsResponse = await axios.get(`${API_URL}/api/enrollments/user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -154,7 +219,9 @@ function MyCourses() {
                   price: item.price,
                   thumbnail: getCourseThumbnail(item.course),
                   enrollmentDate: order.createdAt,
-                  progress: 0, // You'll need to implement progress tracking
+                  progress: 0, // Will be updated when progress data loads
+                  isCompleted: false,
+                  lastWatched: null,
                   duration: item.course.duration || 'N/A',
                   description: item.course.description || '',
                   orderNumber: order.orderNumber,
@@ -183,7 +250,34 @@ function MyCourses() {
 
         setPurchasedCourses(uniquePurchased);
         setFreeCourses(uniqueFree);
+        
+        // Process enrollments (free courses)
+        if (enrollmentsResponse.data.success && enrollmentsResponse.data.enrollments) {
+          const enrolledCourses = enrollmentsResponse.data.enrollments.map(enrollment => ({
+            id: enrollment.course._id,
+            title: enrollment.course.title,
+            instructor: enrollment.course.instructor || 'Unknown Instructor',
+            price: 0, // Free courses
+            thumbnail: getCourseThumbnail(enrollment.course),
+            enrollmentDate: enrollment.enrolledAt,
+            progress: 0, // Will be updated when progress data loads
+            isCompleted: false,
+            lastWatched: null,
+            duration: enrollment.course.duration || 'N/A',
+            description: enrollment.course.description || '',
+            enrollmentType: 'free'
+          }));
+
+          // Add enrolled courses to free courses (avoid duplicates)
+          const existingFreeIds = uniqueFree.map(c => c.id);
+          const newFreeCourses = enrolledCourses.filter(course => !existingFreeIds.includes(course.id));
+          
+          setFreeCourses(prev => [...prev, ...newFreeCourses]);
+        }
       }
+      
+      // Fetch progress after courses are set
+      fetchAllProgress();
 
     } catch (error) {
       console.error('Error fetching user courses:', error);
@@ -227,11 +321,19 @@ function MyCourses() {
               {isPurchased ? 'Purchased' : 'Free'}
             </span>
           </div>
-          {course.progress === 100 && (
+          {course.isCompleted && (
             <div className="position-absolute top-0 start-0 m-2">
               <span className="badge bg-success">
                 <i className="bi bi-check-circle-fill me-1"></i>
                 Completed
+              </span>
+            </div>
+          )}
+          {course.progress > 0 && course.progress < 90 && (
+            <div className="position-absolute top-0 start-0 m-2">
+              <span className="badge bg-warning">
+                <i className="bi bi-play-circle-fill me-1"></i>
+                {course.progress}%
               </span>
             </div>
           )}
@@ -279,9 +381,15 @@ function MyCourses() {
               to={`/course/${course.id}/learning`}
               className="btn btn-primary w-100"
             >
-              {course.progress === 100 ? 'Review Course' : 'Start Learning'}
+              {course.isCompleted ? 'Review Course' : 
+               course.progress > 0 ? `Continue (${course.progress}%)` : 'Start Learning'}
               <i className="bi bi-arrow-right ms-2"></i>
             </Link>
+            {course.lastWatched && (
+              <small className="text-muted mt-2 d-block text-center">
+                Last watched: {new Date(course.lastWatched).toLocaleDateString()}
+              </small>
+            )}
           </div>
         </div>
       </div>
@@ -376,7 +484,7 @@ function MyCourses() {
               <div className="card bg-success text-white text-center">
                 <div className="card-body py-3">
                   <h4 className="mb-1">
-                    {[...purchasedCourses, ...freeCourses].filter(c => c.progress === 100).length}
+                    {[...purchasedCourses, ...freeCourses].filter(c => c.isCompleted).length}
                   </h4>
                   <small>Completed</small>
                 </div>
@@ -386,7 +494,7 @@ function MyCourses() {
               <div className="card bg-warning text-white text-center">
                 <div className="card-body py-3">
                   <h4 className="mb-1">
-                    {[...purchasedCourses, ...freeCourses].filter(c => c.progress > 0 && c.progress < 100).length}
+                    {[...purchasedCourses, ...freeCourses].filter(c => c.progress > 0 && !c.isCompleted).length}
                   </h4>
                   <small>In Progress</small>
                 </div>

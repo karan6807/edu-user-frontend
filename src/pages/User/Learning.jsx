@@ -26,13 +26,28 @@ const Learning = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [savedProgress, setSavedProgress] = useState(null);
+  const [progressLoaded, setProgressLoaded] = useState(false);
   const videoRef = React.useRef(null);
+  const progressSaveTimer = React.useRef(null);
 
   useEffect(() => {
     if (id) {
       fetchCourseData();
+      fetchProgress();
     }
   }, [id]);
+
+  // Load saved progress when video is ready
+  useEffect(() => {
+    if (savedProgress && videoRef.current && !progressLoaded) {
+      const video = videoRef.current;
+      if (video.readyState >= 2) { // Video metadata loaded
+        video.currentTime = savedProgress.currentTime || 0;
+        setProgressLoaded(true);
+      }
+    }
+  }, [savedProgress, progressLoaded]);
 
   const fetchCourseData = async () => {
     try {
@@ -79,6 +94,72 @@ const Learning = () => {
     if (video && video.duration) {
       const progress = (video.currentTime / video.duration) * 100;
       setVideoProgress(progress.toFixed(0)); // round to integer
+      
+      // Save progress every 10 seconds
+      if (progressSaveTimer.current) {
+        clearTimeout(progressSaveTimer.current);
+      }
+      
+      progressSaveTimer.current = setTimeout(() => {
+        saveProgress(video.currentTime, video.duration);
+      }, 2000); // Save after 2 seconds of no time updates
+    }
+  };
+
+  // Fetch saved progress
+  const fetchProgress = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await axios.get(`${API_URL}/api/progress/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        setSavedProgress(response.data.progress);
+      }
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+    }
+  };
+
+  // Save progress to backend
+  const saveProgress = async (currentTime, duration) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      await axios.post(`${API_URL}/api/progress`, {
+        courseId: id,
+        currentTime: currentTime,
+        duration: duration
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Also save to localStorage as backup
+      localStorage.setItem(`progress_${id}`, JSON.stringify({
+        currentTime,
+        duration,
+        timestamp: Date.now()
+      }));
+
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  };
+
+  // Handle video loaded metadata
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (video && savedProgress && savedProgress.currentTime > 0) {
+      video.currentTime = savedProgress.currentTime;
+      setProgressLoaded(true);
     }
   };
 
@@ -108,9 +189,24 @@ const Learning = () => {
   const getImageUrl = () => {
     if (!courseData) return '/default-course-image.jpg';
     if (courseData.thumbnailUrl) {
+      // If it's already a full URL (Cloudinary), use it directly
+      if (courseData.thumbnailUrl.startsWith('http')) {
+        return courseData.thumbnailUrl;
+      }
+      // If it's a relative path (old local uploads), add API_URL
       return `${API_URL}${courseData.thumbnailUrl}`;
     }
     return courseData.image || '/default-course-image.jpg';
+  };
+
+  const getVideoUrl = () => {
+    if (!courseData.videoUrl) return "https://www.w3schools.com/html/mov_bbb.mp4";
+    // If it's already a full URL (Cloudinary), use it directly
+    if (courseData.videoUrl.startsWith('http')) {
+      return courseData.videoUrl;
+    }
+    // If it's a relative path (old local uploads), add API_URL
+    return `${API_URL}${courseData.videoUrl}`;
   };
 
   if (loading) {
@@ -199,19 +295,13 @@ const Learning = () => {
                     <video
                       ref={videoRef}
                       onTimeUpdate={handleTimeUpdate}
+                      onLoadedMetadata={handleLoadedMetadata}
                       controls
                       className="w-100 h-100"
                       style={{ objectFit: "cover", borderRadius: "10px" }}
                       poster={getImageUrl()}
                     >
-                      {courseData.videoUrl ? (
-                        <source src={courseData.videoUrl} type="video/mp4" />
-                      ) : (
-                        <source
-                          src="https://www.w3schools.com/html/mov_bbb.mp4"
-                          type="video/mp4"
-                        />
-                      )}
+                      <source src={getVideoUrl()} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -250,14 +340,25 @@ const Learning = () => {
                         <h6 className="mb-0">Course Progress</h6>
                         <small className="text-muted">
                           {videoProgress}% Complete
+                          {savedProgress && savedProgress.percentage > 0 && (
+                            <span className="ms-2 badge bg-info">
+                              Resume from {savedProgress.percentage}%
+                            </span>
+                          )}
                         </small>
                       </div>
                       <div className="progress" style={{ height: "8px" }}>
                         <div
-                          className="progress-bar bg-success"
+                          className={`progress-bar ${videoProgress >= 90 ? 'bg-success' : 'bg-primary'}`}
                           style={{ width: `${videoProgress}%` }}
                         ></div>
                       </div>
+                      {videoProgress >= 90 && (
+                        <small className="text-success mt-1 d-block">
+                          <i className="bi bi-check-circle-fill me-1"></i>
+                          Course completed! 🎉
+                        </small>
+                      )}
                     </div>
 
                     {/* Course Details Row */}

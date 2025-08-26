@@ -104,7 +104,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
         message = 'Removed from favorites';
       } else {
         // Add to favorites
-        response = await fetch('${API_URL}/api/favorites', {
+        response = await fetch(`${API_URL}/api/favorites`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -153,6 +153,11 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
   // Handle image URL - use thumbnailUrl from backend if available, otherwise fallback to image
   const getImageUrl = () => {
     if (course.thumbnailUrl) {
+      // If it's already a full URL (Cloudinary), use it directly
+      if (course.thumbnailUrl.startsWith('http')) {
+        return course.thumbnailUrl;
+      }
+      // If it's a relative path (old local uploads), add API_URL
       return `${API_URL}${course.thumbnailUrl}`;
     }
     return course.image || '/default-course-image.jpg';
