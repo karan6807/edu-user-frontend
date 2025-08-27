@@ -182,9 +182,7 @@ function Courses() {
         const categoriesResponse = await axios.get(`${API_URL}/api/categories`);
 
         console.log("Fetched courses:", coursesResponse.data);
-        console.log("First course thumbnailUrl:", coursesResponse.data[0]?.thumbnailUrl);
-        console.log("First course thumbnailUrl type:", typeof coursesResponse.data[0]?.thumbnailUrl);
-        console.log("First course thumbnailUrl starts with https:", coursesResponse.data[0]?.thumbnailUrl?.startsWith('https://'));
+        console.log("First course FULL OBJECT:", coursesResponse.data[0]);
         console.log("Fetched categories:", categoriesResponse.data);
 
         setCourses(coursesResponse.data || []);
