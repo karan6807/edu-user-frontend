@@ -252,10 +252,14 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={getCourseThumbnail(course)}
+          src={course.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image'}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}
+          onError={(e) => {
+            console.log('Image failed to load:', course.thumbnail);
+            e.target.src = '/images/default-course-thumbnail.jpg';
+          }}
         />
       </div>
       <div className="card-body d-flex flex-column">

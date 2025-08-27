@@ -174,6 +174,32 @@ function Courses() {
 
         // Use environment variable instead of hardcoded localhost
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        
+        // EXACT getCourseThumbnail function from MyCourses.jsx (WORKING VERSION)
+        const getCourseThumbnail = (course) => {
+          if (course.thumbnailUrl) {
+            // Clean up the URL - remove extra spaces and validate
+            const cleanUrl = course.thumbnailUrl.trim();
+
+            // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
+            if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+              return cleanUrl;
+            }
+
+            // If it's a relative path, make it absolute
+            if (cleanUrl.startsWith('/')) {
+              return `${API_URL}${cleanUrl}`;
+            }
+
+            // If it's just a filename, assume it's in uploads folder
+            if (!cleanUrl.includes('/')) {
+              return `${API_URL}/uploads/courses/${cleanUrl}`;
+            }
+          }
+
+          // Default fallback
+          return '/images/default-course-thumbnail.jpg';
+        };
 
         // Fetch courses
         const coursesResponse = await axios.get(`${API_URL}/api/courses`);
@@ -185,7 +211,12 @@ function Courses() {
         console.log("First course FULL OBJECT:", coursesResponse.data[0]);
         console.log("Fetched categories:", categoriesResponse.data);
 
-        setCourses(coursesResponse.data || []);
+        // Process courses with thumbnail like MyCourses does
+        const processedCourses = (coursesResponse.data || []).map(course => ({
+          ...course,
+          thumbnail: getCourseThumbnail(course)
+        }));
+        setCourses(processedCourses);
         setCategories(categoriesResponse.data || []);
       } catch (err) {
         console.error("Error fetching data:", err);
