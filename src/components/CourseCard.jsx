@@ -151,9 +151,26 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL using utility function
+  // Handle image URL - fixed for all cases
   const getCourseImageUrl = () => {
-    return getImageUrl(course.thumbnailUrl || course.image, API_URL);
+    if (!course?.thumbnailUrl) {
+      return course?.image || '/default-course-image.jpg';
+    }
+    
+    const thumbnailUrl = course.thumbnailUrl.trim();
+    
+    // If it's already a full URL, use it directly
+    if (thumbnailUrl.startsWith('http://') || thumbnailUrl.startsWith('https://')) {
+      return thumbnailUrl;
+    }
+    
+    // If it's just a filename (Cloudinary public_id), construct full URL
+    if (!thumbnailUrl.includes('/') && !thumbnailUrl.startsWith('.')) {
+      return `https://res.cloudinary.com/dkwbac8fy/image/upload/${thumbnailUrl}`;
+    }
+    
+    // If it's a relative path, add API_URL
+    return `${API_URL}${thumbnailUrl}`;
   };
 
   // Get price display text

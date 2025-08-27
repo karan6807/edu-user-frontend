@@ -159,15 +159,24 @@ function CourseDetail() {
     };
 
     const getImageUrl = () => {
-        if (course.thumbnailUrl) {
-            // If it's already a full URL (Cloudinary), use it directly
-            if (course.thumbnailUrl.startsWith('http')) {
-                return course.thumbnailUrl;
-            }
-            // If it's a relative path (old local uploads), add API_URL
-            return `${API_URL}${course.thumbnailUrl}`;
+        if (!course?.thumbnailUrl) {
+            return '/default-course-image.jpg';
         }
-        return course.image || '/default-course-image.jpg';
+        
+        const thumbnailUrl = course.thumbnailUrl.trim();
+        
+        // If it's already a full URL (Cloudinary), use it directly
+        if (thumbnailUrl.startsWith('http://') || thumbnailUrl.startsWith('https://')) {
+            return thumbnailUrl;
+        }
+        
+        // If it's just a filename (Cloudinary public_id), construct full URL
+        if (!thumbnailUrl.includes('/') && !thumbnailUrl.startsWith('.')) {
+            return `https://res.cloudinary.com/dkwbac8fy/image/upload/${thumbnailUrl}`;
+        }
+        
+        // If it's a relative path, add API_URL
+        return `${API_URL}${thumbnailUrl}`;
     };
 
     // Loading state
