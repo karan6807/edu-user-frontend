@@ -212,10 +212,16 @@ function Courses() {
         console.log("Fetched categories:", categoriesResponse.data);
 
         // Process courses with thumbnail like MyCourses does
-        const processedCourses = (coursesResponse.data || []).map(course => ({
-          ...course,
-          thumbnail: getCourseThumbnail(course)
-        }));
+        const processedCourses = (coursesResponse.data || []).map(course => {
+          console.log('Processing course:', course.title);
+          console.log('Original thumbnailUrl:', course.thumbnailUrl);
+          const processedThumbnail = getCourseThumbnail(course);
+          console.log('Processed thumbnail:', processedThumbnail);
+          return {
+            ...course,
+            thumbnail: processedThumbnail
+          };
+        });
         setCourses(processedCourses);
         setCategories(categoriesResponse.data || []);
       } catch (err) {
