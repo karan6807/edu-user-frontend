@@ -109,7 +109,7 @@ const Checkout = () => {
                         instructor: item.course.instructor || "N/A",
                         price: item.course.discountedPrice || item.course.price || 0,
                         image: item.course.thumbnailUrl ?
-                            `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.course.thumbnailUrl}` :
+                            (item.course.thumbnailUrl.startsWith('http') ? item.course.thumbnailUrl : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.course.thumbnailUrl}`) :
                             "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=150&h=100&fit=crop",
                         duration: item.course.duration || "N/A",
                         quantity: item.quantity || 1,
@@ -124,7 +124,7 @@ const Checkout = () => {
                         instructor: item.course.instructor || "N/A",
                         price: item.course.discountedPrice || item.course.price || 0,
                         image: item.course.thumbnailUrl ?
-                            `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.course.thumbnailUrl}` :
+                            (item.course.thumbnailUrl.startsWith('http') ? item.course.thumbnailUrl : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${item.course.thumbnailUrl}`) :
                             "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=150&h=100&fit=crop",
                         duration: item.course.duration || "N/A",
                         quantity: item.quantity || 1,
