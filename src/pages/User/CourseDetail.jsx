@@ -159,28 +159,12 @@ function CourseDetail() {
     };
 
     const getImageUrl = () => {
-        if (course.thumbnailUrl) {
-            // Clean up the URL - remove extra spaces and validate
-            const cleanUrl = course.thumbnailUrl.trim();
-
-            // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
-            if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-                return cleanUrl;
-            }
-
-            // If it's a relative path, make it absolute
-            if (cleanUrl.startsWith('/')) {
-                return `${API_URL}${cleanUrl}`;
-            }
-
-            // If it's just a filename, assume it's in uploads folder
-            if (!cleanUrl.includes('/')) {
-                return `${API_URL}/uploads/courses/${cleanUrl}`;
-            }
+        if (!course?.thumbnailUrl) {
+            return '/images/default-course-thumbnail.jpg';
         }
-
-        // Default fallback
-        return '/images/default-course-thumbnail.jpg';
+        
+        // Just return the thumbnailUrl as-is since backend returns full Cloudinary URLs
+        return course.thumbnailUrl;
     };
 
     // Loading state

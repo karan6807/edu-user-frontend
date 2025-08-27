@@ -183,6 +183,8 @@ function Courses() {
 
         console.log("Fetched courses:", coursesResponse.data);
         console.log("First course thumbnailUrl:", coursesResponse.data[0]?.thumbnailUrl);
+        console.log("First course thumbnailUrl type:", typeof coursesResponse.data[0]?.thumbnailUrl);
+        console.log("First course thumbnailUrl starts with https:", coursesResponse.data[0]?.thumbnailUrl?.startsWith('https://'));
         console.log("Fetched categories:", categoriesResponse.data);
 
         setCourses(coursesResponse.data || []);

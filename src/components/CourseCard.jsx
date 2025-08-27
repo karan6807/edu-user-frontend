@@ -151,33 +151,14 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - Debug and fix
+  // Handle image URL - Simple and direct
   const getCourseImageUrl = () => {
-    console.log('CourseCard thumbnailUrl:', course.thumbnailUrl);
-    
-    if (!course.thumbnailUrl) {
+    if (!course?.thumbnailUrl) {
       return 'https://via.placeholder.com/300x200?text=No+Image';
     }
     
-    const url = course.thumbnailUrl.trim();
-    console.log('CourseCard cleaned URL:', url);
-    
-    // If it contains cloudinary, it's already a full URL
-    if (url.includes('cloudinary.com')) {
-      console.log('CourseCard using Cloudinary URL directly:', url);
-      return url;
-    }
-    
-    // If it starts with http, use directly
-    if (url.startsWith('http')) {
-      console.log('CourseCard using HTTP URL directly:', url);
-      return url;
-    }
-    
-    // Otherwise construct URL
-    const constructedUrl = `${API_URL}/uploads/courses/${url}`;
-    console.log('CourseCard constructed URL:', constructedUrl);
-    return constructedUrl;
+    // Just return the thumbnailUrl as-is since backend returns full Cloudinary URLs
+    return course.thumbnailUrl;
   };
 
   // Get price display text
