@@ -252,32 +252,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={(() => {
-            console.log('🚀 CourseCard thumbnailUrl:', course.thumbnailUrl);
-            
-            if (!course.thumbnailUrl) {
-              return 'https://via.placeholder.com/300x200?text=No+Image';
-            }
-            
-            // HARDCODE: Map specific course IDs to working URLs
-            if (course._id === '68ae911b80570ea964d801ac') {
-              return 'https://res.cloudinary.com/dkwbac8fy/image/upload/v1756270872/edu-uploads/n1jxu2ak8gua0a3lodre.jpg';
-            }
-            if (course._id === '68ae8b916c80a8531ccdeb65') {
-              return 'https://res.cloudinary.com/dkwbac8fy/image/upload/v1756269460/edu-uploads/vqu6ylr3u3blg9voyh4d.png';
-            }
-            
-            // Extract Cloudinary URL if malformed
-            if (course.thumbnailUrl.includes('cloudinary.com')) {
-              const match = course.thumbnailUrl.match(/https:\/\/res\.cloudinary\.com\/[^\s]+/);
-              if (match) {
-                console.log('🎯 Extracted URL:', match[0]);
-                return match[0];
-              }
-            }
-            
-            return 'https://via.placeholder.com/300x200?text=No+Image';
-          })()}
+          src={course.thumbnailUrl || 'https://via.placeholder.com/300x200?text=No+Image'}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}

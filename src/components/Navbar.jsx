@@ -25,7 +25,7 @@ function Navbar() {
     // Function to fetch user info from backend
     const fetchUserInfo = async () => {
         try {
-            const response = await axios.get('${API_URL}/api/user-profile/profile', {
+            const response = await axios.get(`${API_URL}/api/user-profile/profile`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -47,7 +47,7 @@ function Navbar() {
     // Function to fetch cart count from backend
     const fetchCartCount = async () => {
         try {
-            const response = await axios.get("${API_URL}/api/cart", {
+            const response = await axios.get(`${API_URL}/api/cart`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
