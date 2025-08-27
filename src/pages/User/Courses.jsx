@@ -175,30 +175,29 @@ function Courses() {
         // Use environment variable instead of hardcoded localhost
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         
-        // EXACT getCourseThumbnail function from MyCourses.jsx (WORKING VERSION)
+        // FORCE DIRECT CLOUDINARY URL - NO PROCESSING
         const getCourseThumbnail = (course) => {
-          if (course.thumbnailUrl) {
-            // Clean up the URL - remove extra spaces and validate
-            const cleanUrl = course.thumbnailUrl.trim();
-
-            // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
-            if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-              return cleanUrl;
-            }
-
-            // If it's a relative path, make it absolute
-            if (cleanUrl.startsWith('/')) {
-              return `${API_URL}${cleanUrl}`;
-            }
-
-            // If it's just a filename, assume it's in uploads folder
-            if (!cleanUrl.includes('/')) {
-              return `${API_URL}/uploads/courses/${cleanUrl}`;
-            }
+          console.log('Raw thumbnailUrl from backend:', course.thumbnailUrl);
+          
+          if (!course.thumbnailUrl) {
+            return 'https://via.placeholder.com/300x200?text=No+Image';
           }
-
-          // Default fallback
-          return '/images/default-course-thumbnail.jpg';
+          
+          // FORCE: If it contains cloudinary.com, return it directly
+          if (course.thumbnailUrl.includes('cloudinary.com')) {
+            console.log('Using Cloudinary URL directly:', course.thumbnailUrl);
+            return course.thumbnailUrl;
+          }
+          
+          // If it's just a filename, construct Cloudinary URL
+          if (!course.thumbnailUrl.includes('/') && !course.thumbnailUrl.includes('http')) {
+            const cloudinaryUrl = `https://res.cloudinary.com/dkwbac8fy/image/upload/${course.thumbnailUrl}`;
+            console.log('Constructed Cloudinary URL:', cloudinaryUrl);
+            return cloudinaryUrl;
+          }
+          
+          console.log('Using thumbnailUrl as-is:', course.thumbnailUrl);
+          return course.thumbnailUrl;
         };
 
         // Fetch courses
