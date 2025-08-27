@@ -210,33 +210,19 @@ function Courses() {
         console.log("First course FULL OBJECT:", coursesResponse.data[0]);
         console.log("Fetched categories:", categoriesResponse.data);
 
-        // HARDCODE CORRECT CLOUDINARY URLS - BYPASS ALL PROCESSING
+        // ULTIMATE TEST: HARDCODE WORKING CLOUDINARY URL
         const processedCourses = (coursesResponse.data || []).map(course => {
-          console.log('Original course:', course.title, course.thumbnailUrl);
+          console.log('🔍 Original course:', course.title);
+          console.log('🔍 Original thumbnailUrl:', course.thumbnailUrl);
           
-          let correctThumbnail = 'https://via.placeholder.com/300x200?text=No+Image';
+          // FORCE: Use a known working Cloudinary URL for testing
+          const testUrl = 'https://res.cloudinary.com/demo/image/upload/sample.jpg';
           
-          if (course.thumbnailUrl) {
-            // FORCE: Extract just the Cloudinary part if malformed
-            if (course.thumbnailUrl.includes('cloudinary.com')) {
-              // If it contains the full URL, extract it
-              const match = course.thumbnailUrl.match(/(https:\/\/res\.cloudinary\.com\/[^\s]+)/);
-              if (match) {
-                correctThumbnail = match[1];
-              } else {
-                correctThumbnail = course.thumbnailUrl;
-              }
-            } else {
-              // If it's just a filename, construct full Cloudinary URL
-              correctThumbnail = `https://res.cloudinary.com/dkwbac8fy/image/upload/${course.thumbnailUrl}`;
-            }
-          }
-          
-          console.log('Final thumbnail:', correctThumbnail);
+          console.log('🔍 Using test URL:', testUrl);
           
           return {
             ...course,
-            thumbnail: correctThumbnail
+            thumbnail: testUrl
           };
         });
         setCourses(processedCourses);
