@@ -151,14 +151,24 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - Simple and direct
+  // Handle image URL - Force correct URL
   const getCourseImageUrl = () => {
     if (!course?.thumbnailUrl) {
       return 'https://via.placeholder.com/300x200?text=No+Image';
     }
     
-    // Just return the thumbnailUrl as-is since backend returns full Cloudinary URLs
-    return course.thumbnailUrl;
+    let url = course.thumbnailUrl;
+    
+    // If URL already contains the backend URL, it means it got double-processed
+    if (url.includes('edu-backend-yu5r.onrender.com')) {
+      // Extract just the Cloudinary part
+      const cloudinaryPart = url.split('edu-backend-yu5r.onrender.com')[1];
+      if (cloudinaryPart.startsWith('https//')) {
+        url = cloudinaryPart.replace('https//', 'https://');
+      }
+    }
+    
+    return url;
   };
 
   // Get price display text

@@ -112,7 +112,17 @@ function Home() {
                             <div key={course._id} className="col-md-4 mb-4">
                                 <div className="card h-100 shadow-sm">
                                     <img
-                                        src={course.thumbnailUrl || "https://via.placeholder.com/300x180?text=No+Image"}
+                                        src={(() => {
+                                            if (!course.thumbnailUrl) return "https://via.placeholder.com/300x180?text=No+Image";
+                                            let url = course.thumbnailUrl;
+                                            if (url.includes('edu-backend-yu5r.onrender.com')) {
+                                                const cloudinaryPart = url.split('edu-backend-yu5r.onrender.com')[1];
+                                                if (cloudinaryPart.startsWith('https//')) {
+                                                    url = cloudinaryPart.replace('https//', 'https://');
+                                                }
+                                            }
+                                            return url;
+                                        })()}
                                         className="card-img-top"
                                         alt={course.title}
                                         style={{
