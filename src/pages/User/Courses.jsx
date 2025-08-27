@@ -182,6 +182,7 @@ function Courses() {
         const categoriesResponse = await axios.get(`${API_URL}/api/categories`);
 
         console.log("Fetched courses:", coursesResponse.data);
+        console.log("First course thumbnailUrl:", coursesResponse.data[0]?.thumbnailUrl);
         console.log("Fetched categories:", categoriesResponse.data);
 
         setCourses(coursesResponse.data || []);
