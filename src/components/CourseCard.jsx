@@ -1,6 +1,7 @@
 // src/components/CourseCard.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/imageUtils";
 import "./CourseCard.css";
 
 function CourseCard({ course, onFavouriteToggle, showToast }) {
@@ -150,17 +151,9 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - use thumbnailUrl from backend if available, otherwise fallback to image
-  const getImageUrl = () => {
-    if (course.thumbnailUrl) {
-      // If it's already a full URL (Cloudinary), use it directly
-      if (course.thumbnailUrl.startsWith('http')) {
-        return course.thumbnailUrl;
-      }
-      // If it's a relative path (old local uploads), add API_URL
-      return `${API_URL}${course.thumbnailUrl}`;
-    }
-    return course.image || '/default-course-image.jpg';
+  // Handle image URL using utility function
+  const getCourseImageUrl = () => {
+    return getImageUrl(course.thumbnailUrl || course.image, API_URL);
   };
 
   // Get price display text
@@ -238,7 +231,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={getImageUrl()}
+          src={getCourseImageUrl()}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}
