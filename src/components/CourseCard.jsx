@@ -151,26 +151,14 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - fixed for all cases
+  // Handle image URL - simplified and fixed
   const getCourseImageUrl = () => {
     if (!course?.thumbnailUrl) {
       return course?.image || '/default-course-image.jpg';
     }
     
-    const thumbnailUrl = course.thumbnailUrl.trim();
-    
-    // If it's already a full URL, use it directly
-    if (thumbnailUrl.startsWith('http://') || thumbnailUrl.startsWith('https://')) {
-      return thumbnailUrl;
-    }
-    
-    // If it's just a filename (Cloudinary public_id), construct full URL
-    if (!thumbnailUrl.includes('/') && !thumbnailUrl.startsWith('.')) {
-      return `https://res.cloudinary.com/dkwbac8fy/image/upload/${thumbnailUrl}`;
-    }
-    
-    // If it's a relative path, add API_URL
-    return `${API_URL}${thumbnailUrl}`;
+    // Always use thumbnailUrl directly since backend now returns full Cloudinary URLs
+    return course.thumbnailUrl;
   };
 
   // Get price display text

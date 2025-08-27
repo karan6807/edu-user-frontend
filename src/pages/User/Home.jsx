@@ -112,10 +112,7 @@ function Home() {
                             <div key={course._id} className="col-md-4 mb-4">
                                 <div className="card h-100 shadow-sm">
                                     <img
-                                        src={course.thumbnailUrl?.startsWith('http') ? course.thumbnailUrl : 
-                                             (!course.thumbnailUrl?.includes('/') && !course.thumbnailUrl?.startsWith('.') ? 
-                                              `https://res.cloudinary.com/dkwbac8fy/image/upload/${course.thumbnailUrl}` : 
-                                              `${API_URL}${course.thumbnailUrl}`)}
+                                        src={course.thumbnailUrl || "https://via.placeholder.com/300x180?text=No+Image"}
                                         className="card-img-top"
                                         alt={course.title}
                                         style={{
