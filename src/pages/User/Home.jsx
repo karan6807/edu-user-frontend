@@ -112,7 +112,21 @@ function Home() {
                             <div key={course._id} className="col-md-4 mb-4">
                                 <div className="card h-100 shadow-sm">
                                     <img
-                                        src={course.thumbnailUrl || "https://via.placeholder.com/300x180?text=No+Image"}
+                                        src={(() => {
+                                            if (course.thumbnailUrl) {
+                                                const cleanUrl = course.thumbnailUrl.trim();
+                                                if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+                                                    return cleanUrl;
+                                                }
+                                                if (cleanUrl.startsWith('/')) {
+                                                    return `${API_URL}${cleanUrl}`;
+                                                }
+                                                if (!cleanUrl.includes('/')) {
+                                                    return `${API_URL}/uploads/courses/${cleanUrl}`;
+                                                }
+                                            }
+                                            return "https://via.placeholder.com/300x180?text=No+Image";
+                                        })()}
                                         className="card-img-top"
                                         alt={course.title}
                                         style={{

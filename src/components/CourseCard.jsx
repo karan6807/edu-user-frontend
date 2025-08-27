@@ -151,26 +151,30 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - use as-is or construct if needed
+  // Handle image URL - EXACT SAME LOGIC AS MyCourses
   const getCourseImageUrl = () => {
-    if (!course?.thumbnailUrl) {
-      return course?.image || 'https://via.placeholder.com/300x200?text=No+Image';
+    if (course.thumbnailUrl) {
+      // Clean up the URL - remove extra spaces and validate
+      const cleanUrl = course.thumbnailUrl.trim();
+
+      // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
+      if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+        return cleanUrl;
+      }
+
+      // If it's a relative path, make it absolute
+      if (cleanUrl.startsWith('/')) {
+        return `${API_URL}${cleanUrl}`;
+      }
+
+      // If it's just a filename, assume it's in uploads folder
+      if (!cleanUrl.includes('/')) {
+        return `${API_URL}/uploads/courses/${cleanUrl}`;
+      }
     }
-    
-    const url = course.thumbnailUrl;
-    
-    // If it's already a full URL, use it
-    if (url.startsWith('http')) {
-      return url;
-    }
-    
-    // If it's just a filename, construct Cloudinary URL
-    if (!url.includes('/')) {
-      return `https://res.cloudinary.com/dkwbac8fy/image/upload/${url}`;
-    }
-    
-    // Otherwise use as relative path
-    return `${API_URL}${url}`;
+
+    // Default fallback
+    return '/images/default-course-thumbnail.jpg';
   };
 
   // Get price display text
