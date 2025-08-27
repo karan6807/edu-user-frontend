@@ -209,6 +209,20 @@ function Courses() {
         console.log("Fetched courses:", coursesResponse.data);
         console.log("First course FULL OBJECT:", coursesResponse.data[0]);
         console.log("Fetched categories:", categoriesResponse.data);
+        
+        // 🔥 FORCE FIX: Clean malformed URLs in the response data
+        if (coursesResponse.data && Array.isArray(coursesResponse.data)) {
+          coursesResponse.data.forEach(course => {
+            if (course.thumbnailUrl && course.thumbnailUrl.includes('edu-backend-yu5r.onrender.com')) {
+              // Extract the clean Cloudinary URL
+              const match = course.thumbnailUrl.match(/(https:\/\/res\.cloudinary\.com\/[^\s]+)/);
+              if (match) {
+                course.thumbnailUrl = match[1];
+                console.log('🔥 FIXED URL for', course.title, ':', course.thumbnailUrl);
+              }
+            }
+          });
+        }
 
         // ULTIMATE TEST: HARDCODE WORKING CLOUDINARY URL
         const processedCourses = (coursesResponse.data || []).map(course => {
