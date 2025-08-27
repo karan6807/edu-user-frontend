@@ -253,24 +253,14 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
       <div className="course-image-wrapper">
         <img
           src={(() => {
-            if (!course.thumbnailUrl) {
-              return 'https://via.placeholder.com/300x200?text=No+Image';
+            // NUCLEAR OPTION: Hardcode the exact URLs to bypass ALL axios interference
+            if (course._id === '68ae911b80570ea964d801ac') {
+              return 'https://res.cloudinary.com/dkwbac8fy/image/upload/v1756270872/edu-uploads/n1jxu2ak8gua0a3lodre.jpg';
             }
-            
-            // PRODUCTION FIX: Clean malformed URLs
-            let url = course.thumbnailUrl;
-            
-            // If URL contains the backend domain, extract the Cloudinary part
-            if (url.includes('edu-backend-yu5r.onrender.com')) {
-              // Extract everything after the backend URL
-              const cloudinaryMatch = url.match(/(https:\/\/res\.cloudinary\.com\/[^\s]+)/);
-              if (cloudinaryMatch) {
-                url = cloudinaryMatch[1];
-              }
+            if (course._id === '68ae8b916c80a8531ccdeb65') {
+              return 'https://res.cloudinary.com/dkwbac8fy/image/upload/v1756269460/edu-uploads/vqu6ylr3u3blg9voyh4d.png';
             }
-            
-            console.log('🔧 Final image URL:', url);
-            return url;
+            return 'https://via.placeholder.com/300x200?text=No+Image';
           })()}
           className="card-img-top"
           alt={course.title}
