@@ -252,7 +252,26 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={course.thumbnailUrl || 'https://via.placeholder.com/300x200?text=No+Image'}
+          src={(() => {
+            if (!course.thumbnailUrl) {
+              return 'https://via.placeholder.com/300x200?text=No+Image';
+            }
+            
+            // PRODUCTION FIX: Clean malformed URLs
+            let url = course.thumbnailUrl;
+            
+            // If URL contains the backend domain, extract the Cloudinary part
+            if (url.includes('edu-backend-yu5r.onrender.com')) {
+              // Extract everything after the backend URL
+              const cloudinaryMatch = url.match(/(https:\/\/res\.cloudinary\.com\/[^\s]+)/);
+              if (cloudinaryMatch) {
+                url = cloudinaryMatch[1];
+              }
+            }
+            
+            console.log('🔧 Final image URL:', url);
+            return url;
+          })()}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}
