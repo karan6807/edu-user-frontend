@@ -159,22 +159,16 @@ function CourseDetail() {
     };
 
     const getImageUrl = () => {
+        console.log('CourseDetail received thumbnailUrl:', course?.thumbnailUrl);
+        
         if (!course?.thumbnailUrl) {
             return '/images/default-course-thumbnail.jpg';
         }
         
-        let url = course.thumbnailUrl;
-        
-        // If URL already contains the backend URL, it means it got double-processed
-        if (url.includes('edu-backend-yu5r.onrender.com')) {
-            // Extract just the Cloudinary part
-            const cloudinaryPart = url.split('edu-backend-yu5r.onrender.com')[1];
-            if (cloudinaryPart.startsWith('https//')) {
-                url = cloudinaryPart.replace('https//', 'https://');
-            }
-        }
-        
-        return url;
+        // Force return the exact thumbnailUrl from backend
+        const finalUrl = course.thumbnailUrl;
+        console.log('CourseDetail final URL:', finalUrl);
+        return finalUrl;
     };
 
     // Loading state
