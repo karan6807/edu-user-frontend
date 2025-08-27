@@ -151,31 +151,30 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - Clean malformed URLs
-  const getCourseImageUrl = () => {
-    console.log('CourseCard received thumbnailUrl:', course?.thumbnailUrl);
-    
-    if (!course?.thumbnailUrl) {
-      return 'https://via.placeholder.com/300x200?text=No+Image';
-    }
-    
-    let url = course.thumbnailUrl;
-    
-    // Fix malformed URLs that have backend URL prepended
-    if (url.includes('edu-backend-yu5r.onrender.com')) {
-      // Extract everything after the backend URL
-      const parts = url.split('edu-backend-yu5r.onrender.com');
-      if (parts.length > 1) {
-        url = parts[1];
-        // Fix missing colon in https
-        if (url.startsWith('https//')) {
-          url = url.replace('https//', 'https://');
-        }
+  // COPIED FROM MyCourses.jsx - THE WORKING VERSION!
+  const getCourseThumbnail = (course) => {
+    if (course.thumbnailUrl) {
+      // Clean up the URL - remove extra spaces and validate
+      const cleanUrl = course.thumbnailUrl.trim();
+
+      // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
+      if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+        return cleanUrl;
+      }
+
+      // If it's a relative path, make it absolute
+      if (cleanUrl.startsWith('/')) {
+        return `${API_URL}${cleanUrl}`;
+      }
+
+      // If it's just a filename, assume it's in uploads folder
+      if (!cleanUrl.includes('/')) {
+        return `${API_URL}/uploads/courses/${cleanUrl}`;
       }
     }
-    
-    console.log('CourseCard final URL:', url);
-    return url;
+
+    // Default fallback
+    return '/images/default-course-thumbnail.jpg';
   };
 
   // Get price display text
@@ -253,7 +252,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={getCourseImageUrl()}
+          src={getCourseThumbnail(course)}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}

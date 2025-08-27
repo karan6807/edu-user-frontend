@@ -158,30 +158,30 @@ function CourseDetail() {
         return parts.length > 0 ? parts.join(" > ") : "Uncategorized";
     };
 
+    // COPIED FROM MyCourses.jsx - THE WORKING VERSION!
     const getImageUrl = () => {
-        console.log('CourseDetail received thumbnailUrl:', course?.thumbnailUrl);
-        
-        if (!course?.thumbnailUrl) {
-            return '/images/default-course-thumbnail.jpg';
-        }
-        
-        let url = course.thumbnailUrl;
-        
-        // Fix malformed URLs that have backend URL prepended
-        if (url.includes('edu-backend-yu5r.onrender.com')) {
-            // Extract everything after the backend URL
-            const parts = url.split('edu-backend-yu5r.onrender.com');
-            if (parts.length > 1) {
-                url = parts[1];
-                // Fix missing colon in https
-                if (url.startsWith('https//')) {
-                    url = url.replace('https//', 'https://');
-                }
+        if (course.thumbnailUrl) {
+            // Clean up the URL - remove extra spaces and validate
+            const cleanUrl = course.thumbnailUrl.trim();
+
+            // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
+            if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+                return cleanUrl;
+            }
+
+            // If it's a relative path, make it absolute
+            if (cleanUrl.startsWith('/')) {
+                return `${API_URL}${cleanUrl}`;
+            }
+
+            // If it's just a filename, assume it's in uploads folder
+            if (!cleanUrl.includes('/')) {
+                return `${API_URL}/uploads/courses/${cleanUrl}`;
             }
         }
-        
-        console.log('CourseDetail final URL:', url);
-        return url;
+
+        // Default fallback
+        return '/images/default-course-thumbnail.jpg';
     };
 
     // Loading state

@@ -113,18 +113,19 @@ function Home() {
                                 <div className="card h-100 shadow-sm">
                                     <img
                                         src={(() => {
-                                            if (!course.thumbnailUrl) return "https://via.placeholder.com/300x180?text=No+Image";
-                                            let url = course.thumbnailUrl;
-                                            if (url.includes('edu-backend-yu5r.onrender.com')) {
-                                                const parts = url.split('edu-backend-yu5r.onrender.com');
-                                                if (parts.length > 1) {
-                                                    url = parts[1];
-                                                    if (url.startsWith('https//')) {
-                                                        url = url.replace('https//', 'https://');
-                                                    }
+                                            if (course.thumbnailUrl) {
+                                                const cleanUrl = course.thumbnailUrl.trim();
+                                                if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
+                                                    return cleanUrl;
+                                                }
+                                                if (cleanUrl.startsWith('/')) {
+                                                    return `${API_URL}${cleanUrl}`;
+                                                }
+                                                if (!cleanUrl.includes('/')) {
+                                                    return `${API_URL}/uploads/courses/${cleanUrl}`;
                                                 }
                                             }
-                                            return url;
+                                            return "https://via.placeholder.com/300x180?text=No+Image";
                                         })()}
                                         className="card-img-top"
                                         alt={course.title}
