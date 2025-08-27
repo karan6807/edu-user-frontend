@@ -252,13 +252,22 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     <div className="card shadow-sm course-card">
       <div className="course-image-wrapper">
         <img
-          src={course.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image'}
+          src={(() => {
+            // FORCE: Clean the malformed URL
+            if (course.thumbnailUrl && course.thumbnailUrl.includes('cloudinary.com')) {
+              // Extract the clean Cloudinary URL
+              const cleanUrl = course.thumbnailUrl.replace(/.*?(https:\/\/res\.cloudinary\.com\/.*)/, '$1');
+              console.log('🔧 Cleaned URL:', cleanUrl);
+              return cleanUrl;
+            }
+            return course.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image';
+          })()}
           className="card-img-top"
           alt={course.title}
           style={{ height: "180px", objectFit: "cover" }}
           onError={(e) => {
-            console.log('Image failed to load:', course.thumbnail);
-            e.target.src = '/images/default-course-thumbnail.jpg';
+            console.log('Image failed to load:', e.target.src);
+            e.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
           }}
         />
       </div>
