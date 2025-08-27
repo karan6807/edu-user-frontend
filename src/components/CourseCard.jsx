@@ -151,30 +151,33 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - EXACT SAME LOGIC AS MyCourses
+  // Handle image URL - Debug and fix
   const getCourseImageUrl = () => {
-    if (course.thumbnailUrl) {
-      // Clean up the URL - remove extra spaces and validate
-      const cleanUrl = course.thumbnailUrl.trim();
-
-      // Check if it's a valid HTTP/HTTPS URL (Cloudinary)
-      if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-        return cleanUrl;
-      }
-
-      // If it's a relative path, make it absolute
-      if (cleanUrl.startsWith('/')) {
-        return `${API_URL}${cleanUrl}`;
-      }
-
-      // If it's just a filename, assume it's in uploads folder
-      if (!cleanUrl.includes('/')) {
-        return `${API_URL}/uploads/courses/${cleanUrl}`;
-      }
+    console.log('CourseCard thumbnailUrl:', course.thumbnailUrl);
+    
+    if (!course.thumbnailUrl) {
+      return 'https://via.placeholder.com/300x200?text=No+Image';
     }
-
-    // Default fallback
-    return '/images/default-course-thumbnail.jpg';
+    
+    const url = course.thumbnailUrl.trim();
+    console.log('CourseCard cleaned URL:', url);
+    
+    // If it contains cloudinary, it's already a full URL
+    if (url.includes('cloudinary.com')) {
+      console.log('CourseCard using Cloudinary URL directly:', url);
+      return url;
+    }
+    
+    // If it starts with http, use directly
+    if (url.startsWith('http')) {
+      console.log('CourseCard using HTTP URL directly:', url);
+      return url;
+    }
+    
+    // Otherwise construct URL
+    const constructedUrl = `${API_URL}/uploads/courses/${url}`;
+    console.log('CourseCard constructed URL:', constructedUrl);
+    return constructedUrl;
   };
 
   // Get price display text
