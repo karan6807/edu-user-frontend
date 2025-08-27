@@ -151,7 +151,7 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
     }
   };
 
-  // Handle image URL - Force use full Cloudinary URL
+  // Handle image URL - Clean malformed URLs
   const getCourseImageUrl = () => {
     console.log('CourseCard received thumbnailUrl:', course?.thumbnailUrl);
     
@@ -159,10 +159,23 @@ function CourseCard({ course, onFavouriteToggle, showToast }) {
       return 'https://via.placeholder.com/300x200?text=No+Image';
     }
     
-    // Force return the exact thumbnailUrl from backend
-    const finalUrl = course.thumbnailUrl;
-    console.log('CourseCard final URL:', finalUrl);
-    return finalUrl;
+    let url = course.thumbnailUrl;
+    
+    // Fix malformed URLs that have backend URL prepended
+    if (url.includes('edu-backend-yu5r.onrender.com')) {
+      // Extract everything after the backend URL
+      const parts = url.split('edu-backend-yu5r.onrender.com');
+      if (parts.length > 1) {
+        url = parts[1];
+        // Fix missing colon in https
+        if (url.startsWith('https//')) {
+          url = url.replace('https//', 'https://');
+        }
+      }
+    }
+    
+    console.log('CourseCard final URL:', url);
+    return url;
   };
 
   // Get price display text

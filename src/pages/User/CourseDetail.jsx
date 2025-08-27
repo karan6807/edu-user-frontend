@@ -165,10 +165,23 @@ function CourseDetail() {
             return '/images/default-course-thumbnail.jpg';
         }
         
-        // Force return the exact thumbnailUrl from backend
-        const finalUrl = course.thumbnailUrl;
-        console.log('CourseDetail final URL:', finalUrl);
-        return finalUrl;
+        let url = course.thumbnailUrl;
+        
+        // Fix malformed URLs that have backend URL prepended
+        if (url.includes('edu-backend-yu5r.onrender.com')) {
+            // Extract everything after the backend URL
+            const parts = url.split('edu-backend-yu5r.onrender.com');
+            if (parts.length > 1) {
+                url = parts[1];
+                // Fix missing colon in https
+                if (url.startsWith('https//')) {
+                    url = url.replace('https//', 'https://');
+                }
+            }
+        }
+        
+        console.log('CourseDetail final URL:', url);
+        return url;
     };
 
     // Loading state
